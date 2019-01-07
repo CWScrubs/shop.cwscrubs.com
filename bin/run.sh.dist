@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# resolve real path to script including symlinks or other hijinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  TARGET="$(readlink "$SOURCE")"
+  if [[ ${TARGET} == /* ]]; then
+    echo "SOURCE '$SOURCE' is an absolute symlink to '$TARGET'"
+    SOURCE="$TARGET"
+  else
+    BIN="$( dirname "$SOURCE" )"
+    echo "SOURCE '$SOURCE' is a relative symlink to '$TARGET' (relative to '$BIN')"
+    SOURCE="$BIN/$TARGET" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  fi
+done
+RBIN="$( dirname "$SOURCE" )"
+BIN="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+DIR="$( cd -P "$BIN/../" && pwd )"
+ETC="$( cd -P "$DIR/etc" && pwd )"
+OPT="$( cd -P "$DIR/opt" && pwd )"
+SRC="$( cd -P "$DIR/src" && pwd )"
+TMP="$( cd -P "$DIR/tmp" && pwd )"
+VAR="$( cd -P "$DIR/var" && pwd )"
+WEB="$( cd -P "$DIR/web" && pwd )"
+PATH=~/Library/Python/2.7/bin:${PATH}
+
+if [ -z "$DEBUG" ]; then
+    DEBUG=true
+fi
+
+if [ -z "$ENV" ]; then
+    ENV=local
+fi
+
+rm -r ${DIR}/error.log
+rm -r ${DIR}/supervisord.log
+touch ${DIR}/error.log
+touch ${DIR}/supervisord.log
+
+BIN=${BIN} DIR=${DIR} ETC=${ETC} OPT=${OPT} SRC=${SRC} TMP=${TMP} VAR=${VAR} WEB=${WEB} \
+MAGE_ROOT=${WEB} \
+FORCE_SSL=__FORCE_SSL__ \
+CACHE_DIR=${VAR}\cache \
+LOG_DIR=${VAR}\cache \
+ENV=${ENV} DEBUG=${DEBUG} FORCE_SSL=__FORCE_SSL__ \
+REDIS_HOST=127.0.0.1 \
+DB_NAME=__WP_NAME__ \
+DB_USER=__WP_USER__ \
+DB_PASSWORD=__WP_PASSWORD__ \
+DB_HOST=__WP_HOST__ \
+DB_PORT=3306 \
+supervisord -c ${ETC}/supervisor/conf.d/supervisord.conf

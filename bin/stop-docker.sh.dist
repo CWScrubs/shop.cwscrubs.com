@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# resolve real path to script including symlinks or other hijinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  TARGET="$(readlink "$SOURCE")"
+  if [[ ${TARGET} == /* ]]; then
+    echo "SOURCE '$SOURCE' is an absolute symlink to '$TARGET'"
+    SOURCE="$TARGET"
+  else
+    BIN="$( dirname "$SOURCE" )"
+    echo "SOURCE '$SOURCE' is a relative symlink to '$TARGET' (relative to '$BIN')"
+    SOURCE="$BIN/$TARGET" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  fi
+done
+RBIN="$( dirname "$SOURCE" )"
+BIN="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+DIR="$( cd -P "$BIN/../" && pwd )"
+CONTAINER_NAME="__CONTAINER_NAME__"
+
+printf "Killing the site: ${CONTAINER_NAME}\n"
+docker kill ${CONTAINER_NAME}
+printf "${CONTAINER_NAME} is down\n"

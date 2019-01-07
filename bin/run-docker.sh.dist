@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# resolve real path to script including symlinks or other hijinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  TARGET="$(readlink "$SOURCE")"
+  if [[ ${TARGET} == /* ]]; then
+    echo "SOURCE '$SOURCE' is an absolute symlink to '$TARGET'"
+    SOURCE="$TARGET"
+  else
+    BIN="$( dirname "$SOURCE" )"
+    echo "SOURCE '$SOURCE' is a relative symlink to '$TARGET' (relative to '$BIN')"
+    SOURCE="$BIN/$TARGET" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  fi
+done
+RBIN="$( dirname "$SOURCE" )"
+BIN="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+DIR="$( cd -P "$BIN/../" && pwd )"
+
+rm -r ${DIR}/error.log
+rm -r ${DIR}/supervisord.log
+touch ${DIR}/supervisord.log
+touch ${DIR}/error.log
+
+docker pull jessegreathouse/greathouse-wordpress
+docker kill __SITE_NAME__
+docker rm __SITE_NAME__
+
+docker run -d -p __PORT__:3000 \
+    -e ENV=prod \
+    -e DEBUG=false \
+    -e FORCE_SSL=__FORCE_SSL__ \
+    -e DIR="/app" \
+    -e BIN="/app/bin" \
+    -e ETC="/app/etc" \
+    -e OPT="/app/opt" \
+    -e SRC="/app/src" \
+    -e TMP="/app/tmp" \
+    -e VAR="/app/var" \
+    -e WEB="/app/web" \
+    -e MAGE_ROOT="/app/web" \
+    -e CACHE_DIR="/app/var/cache" \
+    -e LOG_DIR="/app/var/logs" \
+    -e REDIS_HOST=redis \
+    -e DB_NAME="__WP_NAME__" \
+    -e DB_USER="__WP_USER__" \
+    -e DB_PASSWORD="__WP_PASSWORD__" \
+    -e DB_HOST="__WP_HOST__" \
+    -e DB_PORT=3306 \
+    -v $(pwd)/error.log:/app/error.log \
+    -v $(pwd)/supervisord.log:/app/supervisord.log \
+    -v $(pwd)/web/wp-authentication-keys.php:/app/web/wp-authentication-keys.php \
+    -v $(pwd)/web/wp-config.php:/app/web/wp-config.php \
+    -v $(pwd)/bin/wp:/app/bin/wp \
+    -v $(pwd)/etc/nginx/nginx.conf:/app/etc/nginx/nginx.conf \
+    -v $(pwd)/etc/php/php.ini:/app/etc/php/php.ini \
+    -v $(pwd)/etc/php/php-fpm.conf:/app/etc/php/php-fpm.conf \
+    -v $(pwd)/web/wp-content/plugins:/app/web/wp-content/plugins \
+    -v $(pwd)/web/wp-content/themes:/app/web/wp-content/themes \
+    -v $(pwd)/web/wp-content/uploads:/app/web/wp-content/uploads \
+    --restart __RESTART_POLICY__ \
+    --name __SITE_NAME__ \
+    jessegreathouse/greathouse-wordpress

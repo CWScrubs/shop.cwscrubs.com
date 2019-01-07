@@ -1,0 +1,26 @@
+{
+    "name": "cwscrubs/shop.cwscrubs.com",
+    "description": "CW Scrubs e-commerce portal",
+    "authors": [
+        {
+            "name": "Jesse Greathouse",
+            "email": "jesse.greathouse@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "": "src/" },
+        "classmap": []
+    },
+    "require": {
+        "monolog/monolog": "^1.21"
+    },
+    "scripts": {
+        "php-ver": [
+            "php -v"
+        ],
+        "post-install-cmd": [
+            "@php-ver"
+        ],
+        "post-update-cmd": []
+    }
+}
