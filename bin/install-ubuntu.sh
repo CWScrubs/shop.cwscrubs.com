@@ -37,7 +37,7 @@ sudo apt-get install -y \
     libcurl4-openssl-dev \
     pkg-config \
     libltdl-dev \
-    libpng12-dev \
+    libpng-dev \
     libpspell-dev \
     libreadline-dev \
     libicu-dev \
@@ -58,7 +58,6 @@ tar -xzf ${OPT}/php-*.tar.gz -C ${OPT}/
 
 cd ${OPT}/php-*/
 #make clean
-./buildconf --force
 
 ./configure --prefix=${OPT}/php \
             --with-config-file-path=${ETC}/php \
@@ -86,8 +85,6 @@ cd ${OPT}/php-*/
             --with-png-dir=/usr/include/ \
             --with-jpeg-dir=/usr/include/ \
             --with-zlib-dir=/usr/include/ \
-            --enable-gd-native-ttf \
-            --with-intl \
             --with-xsl \
             --with-zlib \
             --with-openssl \
