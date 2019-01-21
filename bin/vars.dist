@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# resolve real path to script including symlinks or other hijinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  TARGET="$(readlink "$SOURCE")"
+  if [[ ${TARGET} == /* ]]; then
+    echo "SOURCE '$SOURCE' is an absolute symlink to '$TARGET'"
+    SOURCE="$TARGET"
+  else
+    BIN="$( dirname "$SOURCE" )"
+    echo "SOURCE '$SOURCE' is a relative symlink to '$TARGET' (relative to '$BIN')"
+    SOURCE="$BIN/$TARGET" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  fi
+done
+RBIN="$( dirname "$SOURCE" )"
+BIN="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+DIR="$( cd -P "$BIN/../" && pwd )"
+ETC="$( cd -P "$DIR/etc" && pwd )"
+OPT="$( cd -P "$DIR/opt" && pwd )"
+SRC="$( cd -P "$DIR/src" && pwd )"
+TMP="$( cd -P "$DIR/tmp" && pwd )"
+VAR="$( cd -P "$DIR/var" && pwd )"
+MAGE_ROOT="$( cd -P "$DIR/web" && pwd )"
+MAGE_BIN="$( cd -P "$MAGE_ROOT/bin" && pwd )"
+PATH=${OPT}/php/bin:${PATH}
+HERE="$(pwd)"
+
+if [ -z "$DEBUG" ]; then
+    DEBUG=true
+fi
+
+if [ -z "$ENV" ]; then
+    ENV=local
+fi
+
+SITE_DOMAINS=__SITE_DOMAINS__
+PORT=__PORT__
+FORCE_SSL=__FORCE_SSL__ 
+CACHE_DIR=${VAR}\cache
+LOG_DIR=${VAR}\cache
+ENV=${ENV}
+DATE_TIMEZONE=__DATE_TIMEZONE__
+DEBUG=${DEBUG}
+REDIS_HOST=127.0.0.1
+DB_NAME=__WP_NAME__
+DB_USER=__WP_USER__
+DB_PASSWORD=__WP_PASSWORD__
+DB_HOST=__WP_HOST__
+DB_PORT=3306
+MAGE_ROOT=${MAGE_ROOT}
+MAGE_BIN=${MAGE_BIN}
+TERM=xterm
+PAGER="cat" 
