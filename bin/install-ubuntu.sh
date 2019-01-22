@@ -42,6 +42,7 @@ sudo apt-get install -y \
     libreadline-dev \
     libicu-dev \
     libxml2-dev \
+    libxslt-dev \
     libpng-dev \
     libmcrypt-dev \
     libfreetype6 \
