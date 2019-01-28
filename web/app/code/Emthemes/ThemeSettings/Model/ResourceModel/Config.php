@@ -68,7 +68,7 @@ class Config extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb implem
      * @param int $scopeId
      * @return $this
      */
-    public function deleteConfig($path, $scope, $scopeId)
+    public function deleteConfig($path, $scope = Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeId = 0)
     {
         $connection = $this->getConnection();
         $connection->delete(
