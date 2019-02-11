@@ -26,16 +26,26 @@ MAGE_BIN="$( cd -P "$MAGE_ROOT/bin" && pwd )"
 PUBLIC="$( cd -P "$DIR/web" && pwd )"
 YACC="$( brew --prefix bison )/bin/bison"
 
+MACOSX_DEPLOYMENT_TARGET=10.14
+CFLAGS="-arch x86_64 -g -Os -pipe -no-cpp-precomp"
+CCFLAGS="-arch x86_64 -g -Os -pipe"
+CXXFLAGS="-arch x86_64 -g -Os -pipe"
+LDFLAGS="-arch x86_64 -bind_at_load"
+# export CFLAGS CXXFLAGS LDFLAGS CCFLAGS MACOSX_DEPLOYMENT_TARGET
+
 chmod 755 ${DIR}/..
 
-#install dependencies
-# brew upgrade
-# brew install curl --with-libssh2 --with-openssl
-# brew install intltool icu4c autoconf automake gmp bison@2.7 gd freetype t1lib gettext zlib mcrypt sendemail gmp pcre supervisord
+install dependencies
+brew upgrade
+brew install curl --with-libssh2 --with-openssl
+brew install intltool icu4c autoconf automake gmp bison@2.7 gd freetype t1lib gettext zlib bzip2 mcrypt sendemail gmp pcre supervisord libiconv
 
-# pip install supervisor
+pip install --upgrade pip
+pip install supervisor
 
-tar -xvf ${OPT}/php-*.tar.gz -C ${OPT}/
+export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+
+tar -xf ${OPT}/php-*.tar.gz -C ${OPT}/
 
 cd ${OPT}/php-*/
 
@@ -60,7 +70,7 @@ env YACC=`brew --prefix bison27`/bin/bison ./configure \
     --enable-ipv6 \
     --enable-intl \
     --with-curl=`brew --prefix curl` \
-    --with-iconv \
+    --with-iconv=`brew --prefix libiconv` \
     --with-gmp=`brew --prefix gmp` \
     --with-gd \
     --with-freetype-dir=`brew --prefix freetype` \
@@ -75,17 +85,17 @@ env YACC=`brew --prefix bison27`/bin/bison ./configure \
     --with-pdo-mysql=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
     --with-gettext=`brew --prefix gettext` \
-    --with-zlib \
-    --with-bz2 \
+    --with-zlib=`brew --prefix zlib` \
+    --with-bz2=`brew --prefix bzip2` \
     --with-icu-dir=`brew --prefix icu4c` \
     --with-xsl \
-    --with-mcrypt=`brew --prefix mcrypt`
-make -j `sysctl -n hw.logicalcpu_max`
+#     --with-mcrypt=`brew --prefix mcrypt`
+make -vj `sysctl -n hw.logicalcpu_max`
 make install
 
 rm -rf ${OPT}/php-*/
 
-tar -xvf ${OPT}/openresty-*.tar.gz -C ${OPT}/
+tar -xf ${OPT}/openresty-*.tar.gz -C ${OPT}/
 
 cd ${OPT}/openresty-*/
 ./configure --with-cc-opt="-I/usr/local/include -I/usr/local/opt/openssl/include" \
