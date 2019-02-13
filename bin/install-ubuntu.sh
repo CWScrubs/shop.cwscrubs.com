@@ -86,6 +86,9 @@ cd ${OPT}/php-*/
             --with-png-dir=/usr/include/ \
             --with-jpeg-dir=/usr/include/ \
             --with-zlib-dir=/usr/include/ \
+            --enable-gd-native-ttf \
+            --enable-gd-jis-conv \
+            --enable-mysqlnd \
             --with-xsl \
             --with-zlib \
             --with-openssl \
@@ -94,6 +97,9 @@ cd ${OPT}/php-*/
             --with-mysqli=mysqlnd \
             --with-pdo-mysql=mysqlnd \
             --with-mysql-sock=/tmp/mysql.sock && \
+            --with-gettext \
+            --with-bz2 \
+            
 make
 make install
 rm -rf ${OPT}/php-*/
