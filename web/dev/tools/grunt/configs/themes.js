@@ -50,5 +50,15 @@ module.exports = {
             'css/styles'
         ],
         dsl: 'less'
-    }
+    },
+    bizkick: {
+        area: 'frontend',
+        name: 'Hiddentechies/bizkick',
+        locale: 'en_US',
+        files: [
+            'css/styles-m',
+            'css/styles-l'
+        ],
+        dsl: 'less'
+    },
 };

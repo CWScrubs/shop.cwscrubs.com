@@ -38,7 +38,7 @@ chmod 755 ${DIR}/..
 install dependencies
 brew upgrade
 brew install curl --with-libssh2 --with-openssl
-brew install intltool icu4c autoconf automake gmp bison@2.7 gd freetype t1lib gettext zlib bzip2 mcrypt sendemail gmp pcre supervisord libiconv
+brew install intltool icu4c autoconf automake gmp bison@2.7 gd freetype t1lib gettext zlib bzip2 mcrypt sendemail gmp pcre supervisord libiconv libjpeg8
 
 pip install --upgrade pip
 pip install supervisor
