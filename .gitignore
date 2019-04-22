@@ -134,4 +134,6 @@ web/vendor/*
 !web/vendor/.htaccess
 web/generated/*
 !web/generated/.htaccess
+web/media/*
+!web/media/.gitkeep
 
