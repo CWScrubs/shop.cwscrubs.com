@@ -1,0 +1,171 @@
+<?php
+
+$code = $block->escapeHtml($block->getMethodCode());
+$ccType = $block->getInfoData('cc_type');
+$ccExpMonth = $block->getInfoData('cc_exp_month');
+$ccExpYear = $block->getInfoData('cc_exp_year');
+$cards = $block->getCustomerCards();
+$paymentIntent = $this->getPaymentIntent();
+
+$extraClass = $switchSubscriptionHtml = '';
+$switchSubscription = $block->getSwitchSubscriptionBlock();
+if ($switchSubscription)
+{
+  $extraClass = $switchSubscription->extraClass;
+  $switchSubscriptionHtml = $switchSubscription->toHtml();
+}
+
+?>
+<fieldset id="payment_form_cryozonic_stripe" class="cryozonic-stripe standard-form admin__fieldset indent-target stripe-new" <?php echo $block->hideIfNotBuggy(); ?>>
+
+<?php echo $switchSubscriptionHtml; ?>
+
+<fieldset class="admin__fieldset payment-method stripe-new <?php echo $extraClass; ?> cryozonic-stripe" id="payment_form_cryozonic_stripe_payment">
+
+  <?php if (!empty($cards)): ?>
+    <div class="cryozonic-saved-cards-section" id="saved-cards">
+      <?php foreach ($cards as $key => $card): ?>
+        <div class="cryozonic-saved-card">
+          <input type="radio" name="payment[cc_saved]" class="select"
+                value="<?php echo $card->id . ':' . $card->brand . ':' . $card->last4; ?>" id="<?php echo $card->id; ?>"
+            >
+          <label for="<?php echo $card->id; ?>">
+            <span class="type <?php echo $card->brand ?>">
+                <?php echo (empty($card->brand) ? __('Card') : $block->cardType($card->brand)); ?>
+            </span>
+            <span class="last4 cryozonic-stripe-fade"><?php echo __('ending in'); ?> <?php echo $card->last4; ?></span>
+            <span class="exp cryozonic-stripe-fade"><?php echo __('expires'); ?>
+                <?php echo str_pad($card->exp_month,2,'0',STR_PAD_LEFT); ?>/<?php echo $card->exp_year; ?>
+            </span>
+          </label>
+        </div>
+      <?php endforeach; ?>
+
+      <div>
+        <input type="radio" name="payment[cc_saved]" value="new_card" class="select" id="new_card" checked="checked">
+        <label for="new_card">
+          <span class="type"><?php echo __('Use a new card'); ?></span>
+        </label>
+      </div>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($this->config->isStripeElementsEnabled()): ?>
+
+    <?php echo $block->getLayout()->createBlock('Cryozonic\StripePayments\Block\StripeElements')->toHtml(); ?>
+
+  <?php else: ?>
+
+  <div class="field admin__field _required stripe-new admin-stripe-new">
+    <label class="admin__field-label" for="cryozonic_stripe_cc_owner">
+      <span><?php echo $block->escapeHtml(__('Name on Card')); ?></span>
+    </label>
+    <div class="admin__field-control">
+      <input type="text" id="cryozonic_stripe_cc_owner"
+        <?php if (!$block->config->isStripeJsEnabled()): ?>
+          name="payment[cc_owner]"
+        <?php endif; ?>
+        title="<?php echo $block->escapeHtml(__('Name on Card')); ?>" class="admin__control-text stripe-input"
+        value="<?php /* @noEscape */ echo $block->getInfoData('cc_owner'); ?>" />
+    </div>
+  </div>
+
+  <div class="field-number admin__field _required stripe-new">
+    <label class="admin__field-label" for="cryozonic_stripe_cc_number">
+      <span><?php echo $block->escapeHtml(__('Card Number')); ?></span>
+    </label>
+    <div class="admin__field-control">
+      <input type="text" id="cryozonic_stripe_cc_number"
+      <?php if (!$block->config->isStripeJsEnabled()): ?>
+        name="payment[cc_number]"
+      <?php endif; ?>
+      title="<?php echo $block->escapeHtml(__('Card Number')); ?>" class="admin__control-text stripe-input" value="<?php /* @noEscape */ echo $block->getInfoData('cc_number'); ?>"/>
+    </div>
+  </div>
+
+  <div class="field-date admin__field _required stripe-new">
+    <label class="admin__field-label" for="cryozonic_stripe_expiration_mo">
+      <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
+    </label>
+    <div class="admin__field-control">
+      <select id="cryozonic_stripe_expiration_mo"
+        <?php if (!$block->config->isStripeJsEnabled()): ?>
+          name="payment[cc_exp_month]"
+        <?php endif; ?>
+        class="admin__control-select admin__control-select-month required-entry stripe-input">
+        <?php foreach ($block->getCcMonths() as $k => $v): ?>
+          <option value="<?php echo $block->escapeHtml($k); ?>"
+            <?php if ($k == $ccExpMonth): ?>selected="selected"<?php endif ?>>
+            <?php echo $block->escapeHtml($v); ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <select id="cryozonic_stripe_expiration_yr"
+        <?php if (!$block->config->isStripeJsEnabled()): ?>
+          name="payment[cc_exp_year]"
+        <?php endif; ?>
+        class="admin__control-select admin__control-select-year required-entry stripe-input">
+        <?php foreach ($block->getCcYears() as $k => $v): ?>
+          <option value="<?php /* @noEscape */ echo $k ? $block->escapeHtml($k) : '' ?>"
+            <?php if ($k == $ccExpYear): ?>selected="selected"<?php endif ?>>
+            <?php echo $block->escapeHtml($v); ?>
+          </option>
+        <?php endforeach ?>
+      </select>
+    </div>
+  </div>
+
+  <div class="field-number required admin__field _required stripe-new">
+    <label class="admin__field-label" for="cryozonic_stripe_cc_cid">
+      <span><?php echo $block->escapeHtml(__('Card Verification Number')); ?></span>
+    </label>
+    <div class="admin__field-control">
+      <input type="text" title="<?php echo $block->escapeHtml(__('Card Verification Number')); ?>"
+      class="required-entry admin__control-cvn admin__control-text stripe-input"
+      style="max-width: 50px" id="cryozonic_stripe_cc_cid"
+      <?php if (!$block->config->isStripeJsEnabled()): ?>
+        name="payment[cc_cid]"
+      <?php endif; ?>
+      value="<?php /* @noEscape */ echo $block->getInfoData('cc_cid') ?>"/>
+    </div>
+  </div>
+
+  <?php endif; ?>
+
+  <?php if (!$block->isNewCustomer()): ?>
+  <div class="field admin__field stripe-new">
+    <label class="admin__field-label" for="cryozonic_stripe_cc_save">
+      <input type="checkbox"
+        title="<?php echo $block->escapeHtml(__('Save card for future purchases')); ?>"
+        class="admin__control-cc-save stripe-input"
+        id="cryozonic_stripe_cc_save"
+        name="payment[cc_save]"
+        checked="checked"/>
+      <span><?php echo $block->escapeHtml(__('Save card for future purchases')); ?></span>
+    </label>
+  </div>
+  <?php endif; ?>
+
+</fieldset>
+
+<script type="text/javascript">
+  require(['jquery', 'prototype', 'mage/mage'], function(jQuery, $) {
+    jQuery(document).ready(function()
+    {
+      var securityMethod = '<?php echo $block->config->getSecurityMethod(); ?>';
+      var stripeJsPublishableKey = '<?php echo $block->config->getPublishableKey(); ?>';
+      if (securityMethod > 0)
+      {
+        initStripe(stripeJsPublishableKey, securityMethod);
+        cryozonic.initAdminStripeJs();
+        cryozonic.isAdmin = true;
+        <?php if (!empty($paymentIntent)): ?>
+        cryozonic.paymentIntent = '<?php echo $paymentIntent; ?>';
+        <?php endif; ?>
+      }
+      cryozonic.initAdminEvents();
+    });
+  });
+</script>
+
+</fieldset>

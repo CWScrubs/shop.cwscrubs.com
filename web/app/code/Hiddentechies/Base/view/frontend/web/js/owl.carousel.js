@@ -86,7 +86,7 @@ define([
                 base.$userItems = base.$elem.children();
                 base.itemsAmount = base.$userItems.length;
                 base.wrapItems();
-                base.$owlItems = base.$elem.find(".owl-item");
+                base.$owlItems = base.$elem.find(".");
                 base.$owlWrapper = base.$elem.find(".owl-wrapper");
                 base.playDirection = "next";
                 base.prevItem = 0;
@@ -183,7 +183,7 @@ define([
             },
             wrapItems: function () {
                 var base = this;
-                base.$userItems.wrapAll("<div class=\"owl-wrapper\">").wrap("<div class=\"owl-item\"></div>");
+                base.$userItems.wrapAll("<div class=\"owl-wrapper\">").wrap("<div class=\"\"></div>");
                 base.$elem.find(".owl-wrapper").wrap("<div class=\"owl-wrapper-outer\">");
                 base.wrapperOuter = base.$elem.find(".owl-wrapper-outer");
                 base.$elem.css("display", "block");
@@ -303,7 +303,7 @@ define([
                     var $this = $(this);
                     $this
                             .css({"width": base.itemWidth})
-                            .data("owl-item", Number(index));
+                            .data("", Number(index));
 
                     if (index % base.options.items === 0 || index === lastItem) {
                         if (!(index > lastItem)) {
@@ -1103,7 +1103,7 @@ define([
                         continue;
                     }
 
-                    itemNumber = $item.data("owl-item");
+                    itemNumber = $item.data("");
                     $lazyImg = $item.find(".lazyOwl");
 
                     if (typeof $lazyImg.data("src") !== "string") {

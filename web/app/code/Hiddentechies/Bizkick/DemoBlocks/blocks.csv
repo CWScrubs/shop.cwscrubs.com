@@ -11,7 +11,7 @@ Payments Icons,payment-icons,"<span class=""payment-icons"">
 Home Slider,home-slider,"<div class=""home-slider-wrapper"">
     <div class=""home-slider-main below-padding"">
         <ul class=""home-slider"">
-            <li><a href=""#""><img class=""image-responsive middle-block"" src=""{{media url=""wysiwyg/slider/bizkick-home-banner-1.png""}}"" alt=""home banner"" /> </a></li>
+            <li><a href=""#""><img class=""image-responsive middle-block"" src=""{{media url=""shop.cwscrubs.com/slider/Wonderwink_Hero_123.png""}}"" alt=""home banner"" /> </a></li>
             <li style=""display:none;""><a href=""#""><img class=""image-responsive middle-block"" src=""{{media url=""wysiwyg/slider/bizkick-home-banner-2.png""}}"" alt=""home banner"" /> </a></li>
         </ul>
     </div>
