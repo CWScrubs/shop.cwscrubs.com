@@ -79,7 +79,8 @@
         "zendframework/zend-text": "^2.6.0",
         "zendframework/zend-uri": "^2.5.1",
         "zendframework/zend-validator": "^2.6.0",
-        "zendframework/zend-view": "~2.10.0"
+        "zendframework/zend-view": "~2.10.0",
+        "stripe/stripe-php": "2.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "~2.13.0",
